@@ -1,0 +1,29 @@
+# robots.txt для DRAWBRIDGE
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*.json$
+
+# Скорость сканирования
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://drawbridge.kz/sitemap.xml
+
+# Специфичные боты
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /assets/images/
+
+User-agent: Yandex
+Allow: /
+
+# Блокировка плохих ботов
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
