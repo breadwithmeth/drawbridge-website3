@@ -5,11 +5,11 @@ Disallow: /admin/
 Disallow: /private/
 Disallow: /*.json$
 
-# Скорость сканирования
-Crawl-delay: 1
-
 # Sitemap
 Sitemap: https://drawbridge.kz/sitemap.xml
+
+# Host (используется Яндексом)
+Host: drawbridge.kz
 
 # Специфичные боты
 User-agent: Googlebot

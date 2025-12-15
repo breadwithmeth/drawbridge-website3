@@ -14,6 +14,40 @@
 - Указаны приоритеты и частота обновлений
 - **Важно**: обновляйте дату `lastmod` при изменении контента
 
+### ✅ home-ita.html
+- Английская версия страницы (нужна, чтобы `hreflang` и `sitemap.xml` не ссылались на 404)
+- Должна быть доступна по URL: `https://drawbridge.kz/home-ita.html`
+
+### ✅ Страницы услуг (лендинги под запросы)
+- `website-development.html` — разработка сайтов
+- `mobile-app-development.html` — разработка мобильных приложений
+- `1c-integration.html` — интеграция с 1С
+- `erp-integration.html` — интеграция ERP (обмен данными)
+- `ai-llm.html` — AI/LLM решения
+- `iot.html` — IoT и встраиваемые системы
+- `devops.html` — DevOps и инфраструктура
+- `cloud-migration.html` — миграция в облако
+- `api-development.html` — разработка API
+- `backend-development.html` — backend разработка
+- `frontend-development.html` — frontend разработка
+- `ui-ux-design.html` — UI/UX дизайн
+- `design-system.html` — дизайн‑системы
+- `landing-page.html` — лендинги
+- `corporate-site.html` — корпоративные сайты
+- `ecommerce-development.html` — интернет‑магазины
+- `payment-integration.html` — интеграция оплат
+- `crm-implementation.html` — внедрение CRM
+- `qa-testing.html` — QA тестирование
+- `data-analytics.html` — аналитика/BI
+- `performance-optimization.html` — оптимизация скорости/Core Web Vitals
+- `seo-optimization.html` — техническое SEO
+- `chatbot-development.html` — чат‑боты
+- `telegram-bot-development.html` — Telegram‑боты
+- `website-support.html` — поддержка сайта
+- `mobile-app-support.html` — поддержка мобильного приложения
+
+**Важно:** после добавления/изменения таких страниц обновляйте [sitemap.xml](sitemap.xml) и держите внутренние ссылки на них с главной страницы.
+
 ### ✅ .htaccess
 - Редирект HTTP → HTTPS
 - Редирект www → без www
@@ -29,6 +63,12 @@
 2. Добавьте сайт drawbridge.kz
 3. Подтвердите владение сайтом
 4. Отправьте sitemap.xml: `https://drawbridge.kz/sitemap.xml`
+
+### Важно про hreflang
+- Если вы меняете URL английской версии, обязательно синхронизируйте:
+	- `link rel="alternate" hreflang=...` в [index.html](index.html)
+	- записи и `xhtml:link` в [sitemap.xml](sitemap.xml)
+	- сам файл английской страницы
 
 ### 2. Google Business Profile
 1. Создайте профиль на https://business.google.com
@@ -57,6 +97,10 @@
 - [ ] Оптимизируйте изображения (используйте WebP)
 - [ ] Добавьте lazy loading для изображений
 - [ ] Убедитесь, что SSL сертификат активен
+
+### 5.1 Schema.org (структурированные данные)
+- На главной добавлена разметка `FAQPage` по секции «частые вопросы» — это помогает Google понимать вопросы/ответы.
+- Убран `aggregateRating` из JSON-LD, т.к. без явных отзывов/источника рейтинга на странице такой блок часто считается «самостоятельным рейтингом» и обычно игнорируется.
 
 ### 6. Обратные ссылки (Backlinks)
 Разместите информацию о компании:

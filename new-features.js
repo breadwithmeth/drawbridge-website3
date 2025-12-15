@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     faqItems.forEach(item => {
         const question = item.querySelector('.faq-question');
+
+        if (!question) return;
         
         question.addEventListener('click', function () {
             const isExpanded = item.getAttribute('aria-expanded') === 'true';
@@ -17,27 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Toggle current item
             item.setAttribute('aria-expanded', !isExpanded);
-        });
-    });
-});
-
-// Service Accordion Functionality (existing services section)
-document.addEventListener('DOMContentLoaded', function () {
-    const serviceButtons = document.querySelectorAll('.div-block-22 button');
-
-    serviceButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const parent = this.closest('.div-block-22');
-            const isExpanded = button.getAttribute('aria-expanded') === 'true';
-            
-            // Toggle current item
-            button.setAttribute('aria-expanded', !isExpanded);
-            
-            if (!isExpanded) {
-                parent.classList.add('expanded');
-            } else {
-                parent.classList.remove('expanded');
-            }
         });
     });
 });

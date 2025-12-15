@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const dropdownList = document.querySelector('.dropdown-list');
     const dropdown = document.querySelector('.dropdown');
 
+    if (!dropdownToggle || !dropdownList || !dropdown) {
+        return;
+    }
+
     function closeDropdown() {
         dropdownList.style.display = 'none';
         dropdownToggle.setAttribute('aria-expanded', 'false');
