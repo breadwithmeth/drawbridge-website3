@@ -13,10 +13,17 @@
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
     
-    # Удаление .html из URL
+    # Убрать trailing slash у URL, которые не являются директорией (частая причина 404)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ $1 [L,R=301]
+
+    # Поддержка URL без .html: редирект на канонический URL с .html
+    # (уменьшает дубли вида /page и /page.html и помогает GSC не показывать
+    #  «Вариант страницы с тегом canonical» для extensionless-URL)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^([^\.]+)$ $1.html [NC,L]
+    RewriteCond %{REQUEST_FILENAME}.html -f
+    RewriteRule ^(.+)$ $1.html [NC,L,R=301]
 </IfModule>
 
 # Сжатие GZIP

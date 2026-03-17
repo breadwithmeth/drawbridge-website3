@@ -1,5 +1,7 @@
 // ===== PROJECT COST CALCULATOR =====
 const calculator = {
+    // Global price multiplier: 2.5x lower prices
+    priceMultiplier: 1 / 2.5,
     basePrice: 0,
     additionalPrice: 0,
     urgencyMultiplier: 1,
@@ -71,19 +73,19 @@ const calculator = {
     updateCalculation() {
         // Get base price from selected project type
         const selectedType = document.querySelector('input[name="projectType"]:checked');
-        this.basePrice = selectedType ? parseInt(selectedType.dataset.price) : 0;
+        this.basePrice = selectedType ? this.getAdjustedPrice(selectedType.dataset.price) : 0;
         
         // Calculate additional price from platforms and features
         this.additionalPrice = 0;
         
         const selectedPlatforms = document.querySelectorAll('input[name="platform"]:checked');
         selectedPlatforms.forEach(input => {
-            this.additionalPrice += parseInt(input.dataset.price);
+            this.additionalPrice += this.getAdjustedPrice(input.dataset.price);
         });
         
         const selectedFeatures = document.querySelectorAll('input[name="features"]:checked');
         selectedFeatures.forEach(input => {
-            this.additionalPrice += parseInt(input.dataset.price);
+            this.additionalPrice += this.getAdjustedPrice(input.dataset.price);
         });
         
         // Calculate urgency multiplier
@@ -146,6 +148,11 @@ const calculator = {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(price);
+    },
+
+    getAdjustedPrice(rawPrice) {
+        const value = parseInt(rawPrice, 10) || 0;
+        return Math.round(value * this.priceMultiplier);
     },
     
     requestQuote() {
