@@ -1,3 +1,20 @@
+// Global anti-fraud notice banner
+document.addEventListener('DOMContentLoaded', function () {
+    if (!document.body || document.getElementById('fraud-warning-banner')) {
+        return;
+    }
+
+    const warningBanner = document.createElement('section');
+    warningBanner.id = 'fraud-warning-banner';
+    warningBanner.className = 'fraud-warning-banner';
+    warningBanner.setAttribute('role', 'alert');
+    warningBanner.setAttribute('aria-live', 'polite');
+
+    warningBanner.innerHTML = '<div class="fraud-warning-content"><strong>Внимание:</strong> мошенники могут использовать имя DRAWBRIDGE для незаконных действий. Проверяйте контакты только на этом сайте. Мы не ведем социальные сети и не принимаем обращения через сторонние аккаунты.</div>';
+
+    document.body.insertBefore(warningBanner, document.body.firstChild);
+});
+
 // NavDropDown Fiunctionality
 document.addEventListener('DOMContentLoaded', function () {
     const dropdownToggle = document.querySelector('.dropdown-toggle');

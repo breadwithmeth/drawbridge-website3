@@ -67,6 +67,31 @@ body {
     font-weight: 400;
 }
 
+.fraud-warning-banner {
+    width: 100%;
+    background: linear-gradient(90deg, #8f1f14 0%, #b52a1a 100%);
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1000;
+}
+
+.fraud-warning-content {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 10px clamp(16px, 3vw, 28px);
+    font-family: 'Suisseintl Semi Bold', Arial, sans-serif;
+    font-size: clamp(12px, 1.3vw, 14px);
+    line-height: 1.45;
+    text-align: center;
+}
+
+@media (max-width: 767px) {
+    .fraud-warning-content {
+        text-align: left;
+    }
+}
+
 main {
     width: 100%;
     display: flex;
