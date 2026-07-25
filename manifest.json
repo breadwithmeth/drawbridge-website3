@@ -1,0 +1,34 @@
+{
+  "name": "DRAWBRIDGE — Разработка ПО в Казахстане",
+  "short_name": "DRAWBRIDGE",
+  "description": "Разработка программного обеспечения в Казахстане: веб-разработка, мобильные приложения, интеграция 1С, AI решения.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ff6600",
+  "categories": ["business", "productivity", "developer"],
+  "icons": [
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "161x161",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "161x161",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
