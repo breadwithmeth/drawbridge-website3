@@ -132,12 +132,20 @@ const calculator = {
         
         if (totalPriceEl) {
             totalPriceEl.textContent = this.formatPrice(total);
-            
-            // Add animation
-            totalPriceEl.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                totalPriceEl.style.transform = 'scale(1)';
-            }, 200);
+
+            // Animated pulse: prefer Motion One spring (exposed by motion.js),
+            // fall back to the legacy transform transition if unavailable.
+            const motionLib = window.DrawMotion && window.DrawMotion._motion;
+            if (motionLib && motionLib.animate && !window.DrawMotion.prefersReducedMotion()) {
+                motionLib.animate(totalPriceEl,
+                    { scale: [1, 1.12, 1] },
+                    { duration: 0.5, easing: [0.34, 1.56, 0.64, 1] });
+            } else {
+                totalPriceEl.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    totalPriceEl.style.transform = 'scale(1)';
+                }, 200);
+            }
         }
     },
     

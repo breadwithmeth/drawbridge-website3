@@ -31,47 +31,17 @@ themeToggle?.addEventListener('click', () => {
     setTimeout(() => ripple.remove(), 600);
 });
 
-// ===== SCROLL PROGRESS BAR =====
-const progressBar = document.querySelector('.scroll-progress-bar');
-
-function updateScrollProgress() {
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    
-    const scrollPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
-    progressBar.style.width = `${scrollPercent}%`;
-}
-
-window.addEventListener('scroll', updateScrollProgress);
-window.addEventListener('resize', updateScrollProgress);
+// Scroll progress bar removed as part of top bar removal
 
 // ===== ENHANCED SCROLL ANIMATIONS =====
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-};
-
-const revealOnScroll = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-            // Optionally unobserve after revealing
-            // revealOnScroll.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-// Observe elements with scroll-reveal classes
-document.addEventListener('DOMContentLoaded', () => {
-    const revealElements = document.querySelectorAll(
-        '.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-scale'
-    );
-    
-    revealElements.forEach(el => {
-        revealOnScroll.observe(el);
-    });
-});
+// NOTE: scroll-reveal classes are not used anywhere in the 48 pages (verified
+// via grep: 0 hits for .scroll-reveal*). The legacy observer below observed
+// nothing. Reveal animations are handled by:
+//   • assets/js/motion.js (revealOnScroll) — the unified harness, and
+//   • script.js:67-83 — fallback observer that adds .is-visible to
+//     .slide-in-* / .grow-in / .fade-in (used on ALL 48 pages, kept as a
+//     fallback so reveals still work if motion.js's CDN import fails).
+// The dead observer was removed to avoid duplicating logic.
 
 // ===== SMOOTH SCROLL FOR ANCHOR LINKS =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -92,12 +62,12 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // ===== PARALLAX EFFECT FOR HERO SECTION =====
 const heroSection = document.querySelector('.hero-section');
-if (heroSection) {
+if (heroSection && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
         const parallaxSpeed = 0.5;
         heroSection.style.transform = `translateY(${scrolled * parallaxSpeed}px)`;
-    });
+    }, { passive: true });
 }
 
 // ===== ADD RIPPLE EFFECT TO BUTTONS =====
@@ -170,9 +140,6 @@ function debounce(func, wait = 10) {
     };
 }
 
-// Use debounced scroll for better performance
-const debouncedScrollProgress = debounce(updateScrollProgress, 10);
-window.removeEventListener('scroll', updateScrollProgress);
-window.addEventListener('scroll', debouncedScrollProgress, { passive: true });
+// Debounced scroll handling removed with scroll progress bar
 
 console.log('✨ UX Enhancements loaded successfully!');

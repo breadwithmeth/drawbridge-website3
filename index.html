@@ -234,31 +234,30 @@
 
 <body>
     <!-- Scroll Progress Bar -->
-    <div class="scroll-progress-bar"></div>
-    <header class="navbar">
-        <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
-            <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="5"/>
-                <line x1="12" y1="1" x2="12" y2="3"/>
-                <line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/>
-                <line x1="21" y1="12" x2="23" y2="12"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-            </svg>
-            <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-            </svg>
-        </button>
-        <a href="#contact-us" class="button">Связаться с нами</a>
-    </header>
-    <div class="hero-section">
+    
+    <div class="hero-section" data-hero-parallax>
+        <!-- Full-bleed pixel canvas backdrop behind the centered column -->
+        <div class="hero-canvas" data-hero-canvas-stage aria-hidden="true">
+            <canvas id="pixelCanvas" class="pixel-animation"></canvas>
+            <!-- Floating accent cards orbiting the backdrop -->
+            <div class="hero-float-card hero-float-card--1" data-float-card>
+                <span class="hero-float-card__icon">◷</span>
+                <span class="hero-float-card__label">DevOps</span>
+            </div>
+            <div class="hero-float-card hero-float-card--2" data-float-card>
+                <span class="hero-float-card__icon">⌬</span>
+                <span class="hero-float-card__label">AI/LLM</span>
+            </div>
+            <div class="hero-float-card hero-float-card--3" data-float-card>
+                <span class="hero-float-card__icon">⇄</span>
+                <span class="hero-float-card__label">1C • IoT</span>
+            </div>
+        </div>
+
         <div class="hero-container">
-            <!-- Left Side: Content -->
-            <div class="hero-left">
-                <h1 class="hero-title">
+            <!-- Centered single-column content (overlay on the backdrop) -->
+            <div class="hero-content">
+                <h1 class="hero-title" data-split-words data-stagger-words="0.08">
                     <span class="hero-brand">DRAWBRIDGE</span>
                     <span class="hero-tagline">Разработка ПО в Казахстане • Веб и мобильная разработка Алматы</span>
                 </h1>
@@ -269,45 +268,24 @@
                 </div>
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-number">50+</span>
+                        <span class="stat-number" data-count-up>50+</span>
                         <span class="stat-label">проектов</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">5+</span>
+                        <span class="stat-number" data-count-up>5+</span>
                         <span class="stat-label">лет опыта</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">100%</span>
+                        <span class="stat-number" data-count-up>100%</span>
                         <span class="stat-label">качество</span>
                     </div>
                 </div>
             </div>
-            
-            <!-- Right Side: Animated Graphics -->
-            <div class="hero-right">
-                <div class="geometric-animation">
-                    <canvas id="pixelCanvas" class="pixel-animation"></canvas>
-                </div>
-            </div>
         </div>
     </div>
-
     
 
     <main>
-        <!-- <section class="hero-section">
-            <div class="site-title fade-in">
-                <img src="assets/images/DRAW.png" width="Auto" height="Auto" alt="Elevate" class="image-10"
-                    id="elevate">
-                <img src="assets/images/BRIDGE.png" width="Auto" height="Auto" alt="Studio" class="image-13"
-                    id="studio">
-            </div>
-            <div class="div-block-31">
-                <p class="hero-desc slide-in-right">
-                    Мы — казахстанская <em>IT-компания</em>, предоставляющая услуги по разработке программного обеспечения, интеграции, «под ключ». Строим мост от проблемы к решению.
-                </p>
-            </div>
-        </section> -->
 
         <section class="we-love-everything-section">
             <div class="div-block-4">
@@ -989,7 +967,7 @@
     <script defer src="script.js"></script>
     <script defer src="geometric-shapes.js"></script>
     <script defer src="new-features.js"></script>
-    <script defer src="ux-enhancements.js"></script>
+    <script defer src="ux-enhancements.js"></script><script type="module" defer src="assets/js/motion.js"></script>
     <script defer src="calculator.js"></script>
 </body>
 

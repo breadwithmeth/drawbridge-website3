@@ -13,6 +13,22 @@
     --te-red: #ff0000;
     --te-yellow: #ffcc00;
     --outQuart: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+    /* Motion tokens — shared duration/ease scale for the animation system.
+       Mirrors the spirit of Framer/Motion variant tokens, vanilla-ized. */
+    --dur-fast: 0.32s;
+    --dur-med: 0.6s;
+    --dur-slow: 0.9s;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);      /* expo-ish, snappy exit */
+    --ease-exp: var(--outQuart);                     /* alias for backward compat */
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* slight overshoot for pops */
+
+    /* Glow / glass tokens (used by navbar, buttons, cards, background layers) */
+    --glow-orange: 0 0 24px rgba(255, 102, 0, 0.45);
+    --glass-bg: rgba(250, 250, 250, 0.6);
+    --glass-border: rgba(26, 26, 26, 0.08);
+    --glass-blur: 16px;
 }
 
 html {
@@ -28,6 +44,8 @@ body.dark-theme {
     --white: #1a1a1a;
     --white-03: #1a1a1a03;
     --shadow-1: 0 2px 5px #ffffff0d;
+    --glass-bg: rgba(26, 26, 26, 0.55);
+    --glass-border: rgba(250, 250, 250, 0.08);
 }
 
 body.dark-theme {
@@ -67,31 +85,6 @@ body {
     font-weight: 400;
 }
 
-.fraud-warning-banner {
-    width: 100%;
-    background: linear-gradient(90deg, #8f1f14 0%, #b52a1a 100%);
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    position: relative;
-    z-index: 1000;
-}
-
-.fraud-warning-content {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 10px clamp(16px, 3vw, 28px);
-    font-family: 'Suisseintl Semi Bold', Arial, sans-serif;
-    font-size: clamp(12px, 1.3vw, 14px);
-    line-height: 1.45;
-    text-align: center;
-}
-
-@media (max-width: 767px) {
-    .fraud-warning-content {
-        text-align: left;
-    }
-}
-
 main {
     width: 100%;
     display: flex;
@@ -110,7 +103,9 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 150px clamp(20px, 5%, 80px) 50px;
+    /* Slightly more breathing room at the top now that the fraud-warning banner
+       is gone; keeps the centered hero from feeling buried under the navbar. */
+    padding: 180px clamp(20px, 5%, 80px) 80px;
     background-color: var(--white);
     position: relative;
     overflow: hidden;
@@ -118,15 +113,29 @@ main {
 }
 
 .hero-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 40px;
     max-width: 1400px;
     width: 100%;
-    align-items: center;
+    z-index: 2;          /* content sits above the .hero-canvas backdrop */
+    text-align: center;
 }
 
-/* Left Side: Content */
+/* Centered single-column content (overlay on the backdrop). */
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 900px;
+}
+
+/* Legacy 2-column class retained for reference on inner pages that still use it
+   in their duplicated hero markup. No-op here once .hero-left is absent. */
 .hero-left {
     display: flex;
     flex-direction: column;
@@ -137,7 +146,9 @@ main {
 .hero-title {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
+    text-align: center;
 }
 
 .hero-brand {
@@ -155,13 +166,16 @@ main {
     font-weight: 400;
     line-height: 1.3;
     color: var(--primary-color);
-    max-width: 500px;
+    max-width: 680px;
+    text-align: center;
 }
 
-.hero-cta {
+ .hero-cta {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2rem;
 }
 
 .button-primary {
@@ -211,8 +225,10 @@ main {
 
 .hero-stats {
     display: flex;
-    gap: 40px;
-    margin-top: 20px;
+    gap: 48px;
+    margin-top: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .stat-item {
@@ -237,7 +253,41 @@ main {
     letter-spacing: 0.05em;
 }
 
-/* Right Side: Animated Graphics */
+/* Full-bleed pixel-canvas backdrop (index.html hero).
+   The .hero-canvas element is absolutely positioned inside .hero-section and
+   sits behind the centered .hero-container content (z-index: 1 here, content
+   at z-index: 2 above). Slight desaturation + radial mask keeps text legible. */
+.hero-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;     /* let clicks fall through to the CTA above */
+    -webkit-mask-image: radial-gradient(ellipse 65% 70% at 50% 50%, #000 35%, transparent 85%);
+            mask-image: radial-gradient(ellipse 65% 70% at 50% 50%, #000 35%, transparent 85%);
+    opacity: 0.55;
+}
+
+.hero-canvas .pixel-animation {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* Floating cards live on top of the backdrop. pointer-events re-enabled so the
+   labels are readable; they are aria-hidden in markup. */
+.hero-canvas .hero-float-card { pointer-events: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-canvas { opacity: 0.3; }
+}
+
+/* Legacy 2-column hero-right kept for inner pages that still use it in their
+   duplicated hero markup. */
 .hero-right {
     position: relative;
     height: 600px;
@@ -1015,16 +1065,19 @@ strong {
     }
 
     .hero-container {
-        grid-template-columns: 1fr;
-        gap: 60px;
+        gap: 32px;
+    }
+
+    .hero-content {
+        gap: 32px;
     }
 
     .hero-left {
-        gap: 30px;
+        gap: 30px;          /* inner-page compat */
     }
 
     .hero-right {
-        height: 400px;
+        height: 400px;      /* inner-page compat */
     }
 
     .hero-stats {
@@ -1233,15 +1286,19 @@ strong {
     }
 
     .hero-section {
-        padding: 80px 20px 40px;
+        padding: 130px 20px 40px;
     }
 
     .hero-container {
-        gap: 40px;
+        gap: 28px;
+    }
+
+    .hero-content {
+        gap: 28px;
     }
 
     .hero-left {
-        gap: 24px;
+        gap: 24px;          /* inner-page compat */
     }
 
     .hero-cta {
@@ -2702,4 +2759,454 @@ body {
     .tech-category {
         page-break-inside: avoid;
     }
+}
+
+/* ============================================================================
+   DRAWBRIDGE ANIMATION SYSTEM
+   Vanilla JS + Motion One — see assets/js/motion.js
+   All effects animate transform / opacity / filter only (GPU-friendly).
+   Prefers-reduced-motion: the JS harness short-circuits; CSS below uses
+   transition durations that the existing @media (prefers-reduced-motion)
+   at ~L2672 zeroes out. New keyframes are also gated there (see end of file).
+   ========================================================================= */
+
+/* ---- Phase 1.1: Glassmorphism navbar + shrink-on-scroll --------------- */
+.navbar {
+    /* Upgrade the existing 10px blur with a smoother glass + var-driven. */
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    background-color: var(--glass-bg);
+    border-bottom: 1px solid var(--glass-border);
+    transition:
+        padding-top var(--dur-fast) var(--ease-out),
+        padding-bottom var(--dur-fast) var(--ease-out),
+        box-shadow var(--dur-fast) var(--ease-out),
+        background-color var(--dur-fast) var(--ease-out);
+}
+
+body.dark-theme .navbar { background-color: var(--glass-bg); }
+
+/* Shrink state — toggled by motion.js after 40px scroll. */
+.navbar.scrolled {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    background-color: color-mix(in srgb, var(--white) 78%, transparent);
+}
+
+body.dark-theme .navbar.scrolled {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Theme-toggle icon: smooth crossfade between sun/moon */
+.theme-icon { transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-spring); }
+body:not(.dark-theme) .moon-icon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+body.dark-theme .sun-icon   { opacity: 0; transform: rotate(90deg) scale(0.5); }
+
+/* ---- Phase 1.2: Buttons — magnetic envelope, glow ring, spring press ---- */
+.button,
+.button-primary,
+.button-secondary {
+    position: relative;
+    will-change: transform;
+    transition:
+        transform var(--dur-fast) var(--ease-spring),
+        box-shadow var(--dur-fast) var(--ease-out),
+        background-color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out);
+}
+
+/* Animated orange glow ring on hover. The ::after sits above the existing
+   ::before ripple overlay (z-stacked). */
+.button::after,
+.button-primary::after,
+.button-secondary::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    box-shadow: var(--glow-orange);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-med) var(--ease-out);
+    z-index: -1;
+}
+
+.button:hover::after,
+.button-primary:hover::after,
+.button-secondary:hover::after {
+    opacity: 1;
+}
+
+/* Spring press on click (works alongside the existing JS ripple). */
+.button:active,
+.button-primary:active,
+.button-secondary:active {
+    transform: scale(0.96);
+}
+
+/* Magnetic wrapper affordance: motion.js sets x/y via transform. Keep the
+   fallback :hover lift intact for no-JS / reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+    .button, .button-primary, .button-secondary { will-change: auto; }
+}
+
+/* ---- Phase 1.3: Card system — hover elevation + gradient border sweep -- */
+/* Applied to .motion-card which motion.js attaches to existing card roots
+   inside the homepage so non-home pages keep their original look unless they
+   share the class. */
+.motion-card {
+    position: relative;
+    transition:
+        transform var(--dur-med) var(--ease-spring),
+        box-shadow var(--dur-med) var(--ease-out);
+    will-change: transform;
+    border-radius: 12px;
+}
+
+/* Gradient border-light sweep: a thin conic-gradient pseudo that rotates
+   behind the card, masked to the outline by a clip-path. Cheap and GPU-only. */
+.motion-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--card-sweep-angle, 0deg), transparent, var(--te-orange), transparent 30%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var(--dur-med) var(--ease-out);
+    pointer-events: none;
+}
+
+@property --card-sweep-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+.motion-card:hover::before {
+    opacity: 1;
+    animation: card-sweep 2.5s linear infinite;
+}
+
+@keyframes card-sweep {
+    to { --card-sweep-angle: 360deg; }
+}
+
+.motion-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.18), var(--glow-orange);
+}
+
+body.dark-theme .motion-card:hover {
+    box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 102, 0, 0.25);
+}
+
+/* ---- Phase 1.4: Upgraded reveal variants ------------------------------- */
+/* Mask reveal: text emerges from a horizontal clip wipe. */
+.reveal-mask {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--dur-slow) var(--ease-out);
+}
+.reveal-mask.is-visible,
+.reveal-mask.revealed { clip-path: inset(0 0 0 0); }
+
+/* Clip-path rise: panel slides up from a clipped top edge. */
+.reveal-clip {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(40px);
+    opacity: 0;
+    transition:
+        clip-path var(--dur-slow) var(--ease-out),
+        transform var(--dur-slow) var(--ease-out),
+        opacity var(--dur-slow) var(--ease-out);
+}
+.reveal-clip.is-visible,
+.reveal-clip.revealed {
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Split-text reveal spans (word/char). motion.js sets the inline states. */
+.split-word, .split-char {
+    display: inline-block;
+    will-change: opacity, transform, filter;
+}
+
+/* ---- Phase 2: Layered animated background ------------------------------ */
+/* Single fixed .bg-layers container injected once by motion.js. Sits behind
+   all content (z-index: -1) and is pointer-events: none. Reduced-motion
+   users get a single static tint instead of the live layers. */
+.bg-layers {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--white);
+}
+
+body.dark-theme .bg-layers { background: var(--white); }
+
+/* L1 — subtle grid */
+.bg-layer-grid {
+    position: absolute; inset: -2px;
+    background-image:
+        linear-gradient(var(--primary-color-77) 1px, transparent 1px),
+        linear-gradient(90deg, var(--primary-color-77) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.25;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 80%);
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 80%);
+}
+
+/* L2 — slow drifting gradient mesh */
+.bg-layer-mesh {
+    position: absolute; inset: -25%;
+    background: radial-gradient(40% 40% at 20% 30%, rgba(255, 102, 0, 0.10), transparent 60%),
+                radial-gradient(40% 40% at 80% 20%, rgba(255, 0, 0, 0.06), transparent 60%),
+                radial-gradient(50% 50% at 50% 80%, rgba(255, 204, 0, 0.05), transparent 60%);
+    filter: blur(40px);
+    animation: bg-drift 24s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes bg-drift {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(4%, -3%, 0) scale(1.08); }
+}
+
+/* L3 — moving horizontal light beam */
+.bg-layer-beam {
+    position: absolute; left: -10%; right: -10%; top: 30%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--te-orange), transparent);
+    filter: blur(1px) drop-shadow(0 0 6px var(--te-orange));
+    opacity: 0.5;
+    animation: bg-beam 14s var(--ease-in-out) infinite;
+}
+
+@keyframes bg-beam {
+    0%, 100% { transform: translateY(0) scaleX(0.6); opacity: 0.15; }
+    50%      { transform: translateY(40vh) scaleX(1); opacity: 0.55; }
+}
+
+/* L4 — floating particles (canvas-free DOM motes for portability) */
+.bg-layer-particles { position: absolute; inset: 0; }
+.bg-particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--te-orange);
+    opacity: 0.35;
+    filter: blur(0.5px);
+    animation: bg-float var(--p-dur, 18s) var(--ease-in-out) infinite;
+    animation-delay: var(--p-delay, 0s);
+}
+
+@keyframes bg-float {
+    0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+    10%  { opacity: 0.4; }
+    50%  { transform: translate3d(var(--p-x, 20px), -30vh, 0); opacity: 0.3; }
+    90%  { opacity: 0.2; }
+    100% { transform: translate3d(calc(var(--p-x, 20px) * -1), -60vh, 0); opacity: 0; }
+}
+
+/* L5 — blurred glowing orbs */
+.bg-layer-orbs {
+    position: absolute; inset: 0;
+}
+.bg-orb {
+    position: absolute;
+    width: 32vmax; height: 32vmax; max-width: 520px; max-height: 520px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    animation: bg-orb-drift var(--o-dur, 30s) var(--ease-in-out) infinite alternate;
+}
+.bg-orb--1 { top: -10%; left: -8%;  background: var(--te-orange); --p-x: 8%; --p-y: 10%; }
+.bg-orb--2 { bottom: -15%; right: -10%; background: var(--te-red);   --p-x: -6%; --p-y: -8%; }
+.bg-orb--3 { top: 40%; left: 40%;  background: var(--te-yellow); opacity: 0.10; }
+
+@keyframes bg-orb-drift {
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(var(--p-x), var(--p-y), 0); }
+}
+
+/* L6 — SVG noise overlay */
+.bg-layer-noise {
+    position: absolute; inset: 0;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* L7 — occasional laser sweep (rotating thin line) */
+.bg-layer-laser {
+    position: absolute; top: 50%; left: 50%;
+    width: 200vmax; height: 1px;
+    transform-origin: 0 0;
+    background: linear-gradient(90deg, transparent, var(--te-orange) 45%, #fff 50%, var(--te-orange) 55%, transparent);
+    opacity: 0;
+    animation: bg-laser 18s var(--ease-in-out) infinite;
+    animation-delay: 6s;
+    filter: blur(0.5px);
+}
+
+@keyframes bg-laser {
+    0%, 88%, 100% { opacity: 0; transform: rotate(0deg); }
+    90%           { opacity: 0.35; }
+    94%           { opacity: 0.2; transform: rotate(160deg); }
+    98%           { opacity: 0; transform: rotate(180deg); }
+}
+
+/* Page content must sit above the background. Existing layers already use
+   backgrounds on body/section so we lift <main>, header, hero & footer. */
+.navbar, .hero-section, main, .footer, .scroll-progress-bar {
+    position: relative; z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* Kill every background/section animation; keep one static tint. */
+    .bg-layer-mesh, .bg-layer-beam, .bg-particle, .bg-orb, .bg-layer-laser,
+    .motion-card::before { animation: none !important; }
+    .bg-layer-beam, .bg-layer-laser { opacity: 0; }
+    .bg-particle { display: none; }
+}
+
+/* ============================================================================
+   HERO REDESIGN (index.html) — centered single-column overlay layout
+   The .hero-canvas backdrop sits behind .hero-container (z-index 1 vs 2).
+   Mouse-reactive stage wrapper — motion.js applies subtle rotateX/Y via
+   trackMouse(). Reduced motion: stays flat.
+   ========================================================================= */
+.hero-canvas[data-hero-canvas-stage] { transition: transform var(--dur-slow) var(--ease-out); perspective: 1200px; }
+@media (prefers-reduced-motion: reduce) {
+    .hero-canvas[data-hero-canvas-stage] { transition: none; transform: none !important; }
+}
+
+/* Floating accent cards — spring float loop driven by motion.js. */
+.hero-float-card {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-1);
+    font-family: 'Suisseintl Semi Bold', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--primary-color);
+    white-space: nowrap;
+    will-change: transform;
+    opacity: 0;
+}
+.hero-float-card[data-float-visible] { opacity: 1; transition: opacity var(--dur-slow) var(--ease-out); }
+
+.hero-float-card__icon {
+    font-size: 16px;
+    color: var(--te-orange);
+    line-height: 1;
+}
+
+.hero-float-card--1 { top: 14%;    left: 6%; }
+.hero-float-card--2 { top: 22%;    right: 7%; }
+.hero-float-card--3 { bottom: 16%; left: 11%; }
+
+/* Mask-reveal headline: words emerge via blur-in (motion.js splits). */
+.hero-title .split-word { display: inline-block; }
+.hero-title .hero-brand .split-word { margin-right: 0.2em; }
+
+/* Hero parallax target — motion.js drives a gentle translateY on scroll. */
+.hero-section[data-hero-parallax] { will-change: transform; }
+@media (prefers-reduced-motion: reduce) {
+    .hero-section[data-hero-parallax] { will-change: auto; transform: none !important; }
+}
+
+@media (max-width: 991px) {
+    /* On tablets the cards shrink and tuck nearer the section edges. */
+    .hero-float-card { font-size: 11px; padding: 8px 10px; }
+    .hero-float-card--1 { top: 12%; left: 4%; }
+    .hero-float-card--2 { top: 18%; right: 4%; }
+    .hero-float-card--3 { bottom: 12%; left: 6%; }
+}
+@media (max-width: 767px) {
+    .hero-float-card { display: none; }
+}
+
+/* ============================================================================
+   PER-SECTION POLISH (index.html) -- Phase 4
+   ========================================================================= */
+
+/* Marquee: velocity-based skew on fast scroll (var set by motion.js). */
+.we-love-everything-section .jumbo-text-scroll {
+    transform: skewX(var(--marquee-skew, 0deg));
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+.we-love-everything-section .jumbo-text,
+.we-love-everything-section .jumbo-row {
+    transition: transform var(--dur-fast) var(--ease-out);
+    will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+    .we-love-everything-section .jumbo-text-scroll { transform: none !important; }
+}
+
+/* FAQ answer panel base (motion.js sets max-height/opacity inline). */
+.faq-item.is-faq-enhanced .faq-answer,
+.faq-item.is-faq-enhanced .faq-answer-content {
+    will-change: max-height, opacity;
+}
+/* Hide the panel when closed; motion.js reveals/animates via inline styles. */
+.faq-item.is-faq-enhanced:not([aria-expanded="true"]) .faq-answer,
+.faq-item.is-faq-enhanced:not([aria-expanded="true"]) .faq-answer-content {
+    max-height: 0;
+    overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+    .faq-item.is-faq-enhanced .faq-answer,
+    .faq-item.is-faq-enhanced .faq-answer-content { transition: none !important; }
+}
+
+/* Footer: subtle lift on links + animated logo (CSS-only, GPU). */
+.footer a {
+    transition: transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) var(--ease-out);
+    will-change: transform;
+}
+.footer a:hover { transform: translateY(-2px); color: var(--te-orange); }
+.footer img,
+.footer .footer-logo {
+    transition: transform var(--dur-med) var(--ease-spring), filter var(--dur-med) var(--ease-out);
+}
+.footer img:hover,
+.footer .footer-logo:hover {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 12px rgba(255, 102, 0, 0.4));
+}
+@media (prefers-reduced-motion: reduce) {
+    .footer a, .footer img, .footer .footer-logo { transition: none !important; }
+}
+
+/* About section heading mask reveal (motion.js adds .reveal-mask). */
+.about-section h3 { will-change: clip-path; }
+
+/* Carousel images blur-up (motion.js toggles opacity). */
+.images-carousal img {
+    filter: blur(8px);
+    transition: opacity var(--dur-med) var(--ease-out), filter var(--dur-slow) var(--ease-out);
+}
+/* motion.js sets data-loaded="1" after the image's load event fires. */
+.images-carousal img[data-loaded="1"] {
+    filter: blur(0);
+}
+@media (prefers-reduced-motion: reduce) {
+    .images-carousal img { filter: none !important; opacity: 1 !important; transition: none !important; }
 }

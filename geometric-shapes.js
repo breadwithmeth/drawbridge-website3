@@ -2,7 +2,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('pixelCanvas');
     if (!canvas) return;
-    
+
+    // Respect prefers-reduced-motion: render one static frame and skip the
+    // continuous RAF loop. The canvas stays visually present (it is the
+    // Drawbridge brand motif) but stops animating.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const ctx = canvas.getContext('2d');
     
     // Set canvas size
@@ -173,9 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
             shape.update();
             shape.draw();
         });
-        
-        requestAnimationFrame(animate);
+
+        // Only schedule the next frame when motion is allowed. Under
+        // prefers-reduced-motion we render a single static frame (see below).
+        if (!reduceMotion) requestAnimationFrame(animate);
     }
-    
+
+    // Render once for everyone; the loop continues only when motion is allowed.
     animate();
 });

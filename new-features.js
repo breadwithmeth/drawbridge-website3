@@ -65,23 +65,6 @@ ${data.message}
 });
 
 // Smooth scroll for anchor links
-document.addEventListener('DOMContentLoaded', function () {
-    const links = document.querySelectorAll('a[href^="#"]');
-    
-    links.forEach(link => {
-        link.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-            
-            e.preventDefault();
-            const target = document.querySelector(href);
-            
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-});
+// NOTE: This logic is duplicated in ux-enhancements.js (the canonical copy).
+// Removed here to avoid double-wiring identical handlers. ux-enhancements.js
+// runs on all 48 pages and is loaded before this file, so it always wins.
