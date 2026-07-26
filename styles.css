@@ -31,8 +31,13 @@
     --glass-blur: 16px;
 }
 
-html {
-    scroll-behavior: smooth;
+/* Smooth scrolling — only when the user hasn't requested reduced motion.
+   scroll-behavior: smooth can introduce micro-jank on heavy pages because
+   the browser must interpolate every scroll step. */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
 }
 
 /* Dark Theme Variables */
@@ -132,6 +137,12 @@ main {
     gap: 40px;
     width: 100%;
     max-width: 900px;
+    /* Subtle frosted-glass blur for depth */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 16px;
+    padding: 24px 20px;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 /* Legacy 2-column class retained for reference on inner pages that still use it
@@ -2686,14 +2697,14 @@ body.dark-theme .moon-icon {
 .scroll-reveal:nth-child(5) { transition-delay: 0.5s; }
 .scroll-reveal:nth-child(6) { transition-delay: 0.6s; }
 
-/* Smooth transitions for theme */
+/* Smooth theme transitions — scoped to structural containers only.
+   Avoid transitioning on free-text elements (div, p, h1-h6) — that forces
+   the browser to track hundreds of elements and causes scroll jank. */
 body,
 main,
-header,
-section,
-div,
-p,
-h1, h2, h3, h4, h5, h6 {
+.navbar,
+.hero-section,
+.footer {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -2853,7 +2864,6 @@ body.dark-theme .sun-icon   { opacity: 0; transform: rotate(90deg) scale(0.5); }
 .button-primary,
 .button-secondary {
     position: relative;
-    will-change: transform;
     transition:
         transform var(--dur-fast) var(--ease-spring),
         box-shadow var(--dur-fast) var(--ease-out),
@@ -2905,7 +2915,6 @@ body.dark-theme .sun-icon   { opacity: 0; transform: rotate(90deg) scale(0.5); }
     transition:
         transform var(--dur-med) var(--ease-spring),
         box-shadow var(--dur-med) var(--ease-out);
-    will-change: transform;
     border-radius: 12px;
 }
 
@@ -2976,10 +2985,10 @@ body.dark-theme .motion-card:hover {
     opacity: 1;
 }
 
-/* Split-text reveal spans (word/char). motion.js sets the inline states. */
+/* Split-text reveal spans (word/char). will-change is set by JS during
+   animation and removed after; no permanent GPU layer. */
 .split-word, .split-char {
     display: inline-block;
-    will-change: opacity, transform, filter;
 }
 
 /* ---- Phase 2: Layered animated background ------------------------------ */
@@ -3009,14 +3018,15 @@ body.dark-theme .bg-layers { background: var(--white); }
             mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 80%);
 }
 
-/* L2 — slow drifting gradient mesh */
+/* L2 — slow drifting gradient mesh. Blur radius reduced to avoid scroll jank. */
 .bg-layer-mesh {
     position: absolute; inset: -25%;
     background: radial-gradient(40% 40% at 20% 30%, rgba(255, 102, 0, 0.10), transparent 60%),
                 radial-gradient(40% 40% at 80% 20%, rgba(255, 0, 0, 0.06), transparent 60%),
                 radial-gradient(50% 50% at 50% 80%, rgba(255, 204, 0, 0.05), transparent 60%);
-    filter: blur(40px);
+    filter: blur(20px);
     animation: bg-drift 24s var(--ease-in-out) infinite alternate;
+    will-change: transform;
 }
 
 @keyframes bg-drift {
@@ -3066,11 +3076,12 @@ body.dark-theme .bg-layers { background: var(--white); }
 }
 .bg-orb {
     position: absolute;
-    width: 32vmax; height: 32vmax; max-width: 520px; max-height: 520px;
+    width: 24vmax; height: 24vmax; max-width: 400px; max-height: 400px;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.18;
+    filter: blur(40px);
+    opacity: 0.16;
     animation: bg-orb-drift var(--o-dur, 30s) var(--ease-in-out) infinite alternate;
+    will-change: transform;
 }
 .bg-orb--1 { top: -10%; left: -8%;  background: var(--te-orange); --p-x: 8%; --p-y: 10%; }
 .bg-orb--2 { bottom: -15%; right: -10%; background: var(--te-red);   --p-x: -6%; --p-y: -8%; }
@@ -3171,9 +3182,8 @@ body.dark-theme .bg-layers { background: var(--white); }
 .hero-title .hero-brand .split-word { margin-right: 0.2em; }
 
 /* Hero parallax target — motion.js drives a gentle translateY on scroll. */
-.hero-section[data-hero-parallax] { will-change: transform; }
 @media (prefers-reduced-motion: reduce) {
-    .hero-section[data-hero-parallax] { will-change: auto; transform: none !important; }
+    .hero-section[data-hero-parallax] { transform: none !important; }
 }
 
 @media (max-width: 991px) {
@@ -3199,7 +3209,6 @@ body.dark-theme .bg-layers { background: var(--white); }
 .we-love-everything-section .jumbo-text,
 .we-love-everything-section .jumbo-row {
     transition: transform var(--dur-fast) var(--ease-out);
-    will-change: transform;
 }
 @media (prefers-reduced-motion: reduce) {
     .we-love-everything-section .jumbo-text-scroll { transform: none !important; }
@@ -3221,10 +3230,9 @@ body.dark-theme .bg-layers { background: var(--white); }
     .faq-item.is-faq-enhanced .faq-answer-content { transition: none !important; }
 }
 
-/* Footer: subtle lift on links + animated logo (CSS-only, GPU). */
+/* Footer: subtle lift on links + animated logo (CSS-only, GPU-friendly). */
 .footer a {
     transition: transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) var(--ease-out);
-    will-change: transform;
 }
 .footer a:hover { transform: translateY(-2px); color: var(--te-orange); }
 .footer img,

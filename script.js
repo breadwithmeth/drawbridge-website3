@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let isPaused = false;
     let rafId = null;
     let isJumping = false;
+    let isOffScreen = false;
     let halfwayPoint;
     const scrollStep = 1;
 
@@ -129,8 +130,16 @@ document.addEventListener('DOMContentLoaded', function () {
     setDimensions();
     scrollContainer.scrollLeft = 0;
 
+    /* Visibility observer: pause the RAF loop when the carousel is off-screen
+       to avoid wasting CPU/GPU cycles on an invisible animation. Resumes
+       automatically when it scrolls back into view. */
+    const carouselObserver = new IntersectionObserver((entries) => {
+        isOffScreen = !entries[0].isIntersecting;
+    }, { threshold: 0.01 });
+    carouselObserver.observe(scrollContainer);
+
     function scrollLoop() {
-        if (!isPaused) {
+        if (!isPaused && !isOffScreen) {
             scrollContainer.scrollLeft += scrollStep;
         }
         rafId = requestAnimationFrame(scrollLoop);
