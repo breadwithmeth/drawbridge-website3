@@ -615,10 +615,14 @@ strong {
 
 .jumbo-text-scroll {
     color: var(--primary-color);
-    width: 110vw;
-    margin-left: -9%;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
     font-size: 96px;
     overflow: clip;
+    position: relative;
+    left: 0;
+    right: 0;
 }
 
 .jumbo-text-wrapper {
@@ -2038,6 +2042,12 @@ strong {
     color: var(--secondary-color);
 }
 
+/* Why Choose DRAWBRIDGE Section
+ * DELETED - Section removed from HTML
+ */
+    margin: 0;
+}
+
 /* FAQ Section */
 
 /* Updated styling for the “Почему выбирают” text section – full‑width */
@@ -2495,9 +2505,7 @@ strong {
     .calc-total-price {
         font-size: 36px;
     }
-}
 
-@media screen and (max-width: 767px) {
     .portfolio-results {
         flex-direction: column;
         gap: 16px;
@@ -3247,3 +3255,5 @@ body.dark-theme .bg-layers { background: var(--white); }
 @media (prefers-reduced-motion: reduce) {
     .images-carousal img { filter: none !important; opacity: 1 !important; transition: none !important; }
 }
+
+/* Why Choose Section - Additional responsive styles */
